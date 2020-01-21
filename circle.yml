@@ -240,7 +240,7 @@ commands:
     parameters:
       build-ios-test-runner:
         type: boolean
-        default: false
+        default: true
     steps:
       - run:
           name: Prepare macOS
@@ -696,8 +696,7 @@ jobs:
     steps:
       - checkout
       - next-prepare
-      - next-prepare-macos:
-          build-ios-test-runner: true
+      - next-prepare-macos
       - run:
           name: Prepare codesign keychain 
           command: |
