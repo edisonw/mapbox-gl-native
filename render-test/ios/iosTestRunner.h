@@ -2,5 +2,6 @@
 __attribute__((visibility ("default")))
 @interface IosTestRunner : NSObject
 - (NSString*) getResultPath;
+- (NSString*) getMetricPath;
 - (BOOL) getTestStatus;
 @end

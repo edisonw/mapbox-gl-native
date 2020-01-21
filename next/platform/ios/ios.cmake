@@ -94,16 +94,13 @@ target_link_libraries(
 )
 
 if(MBGL_IOS_RENDER_TEST)
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-
+    set(CMAKE_OSX_ARCHITECTURES "armv7;i386;x86_64;arm64")
     set(PREPARE_CMD "${MBGL_ROOT}/render-test/ios/setup_test_data.sh")
     message("COMMAND: ${PREPARE_CMD}")
     execute_process(COMMAND ${PREPARE_CMD} RESULT_VARIABLE CMD_ERROR)
     message(STATUS "CMD_ERROR:" ${CMD_ERROR})
 
     set(RESOURCES ${MBGL_ROOT}/render-test/ios/Main.storyboard ${MBGL_ROOT}/render-test/ios/LaunchScreen.storyboard ${MBGL_ROOT}/test-data)
-
-    set(PUBLIC_HEADER ${MBGL_ROOT}/render-test/ios/iosTestRunner.h)
 
     add_executable(
         RenderTestApp
@@ -115,13 +112,20 @@ if(MBGL_IOS_RENDER_TEST)
         ${MBGL_ROOT}/render-test/ios/ViewController.m
         ${MBGL_ROOT}/render-test/ios/iosTestRunner.h
         ${MBGL_ROOT}/render-test/ios/iosTestRunner.mm
-        ${MBGL_ROOT}/render-test/ios/main.m
-        ${RESOURCES}
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/ZipArchive.h
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/ZipArchive.mm
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/crypt.h
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/ioapi.h
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/mztools.h
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/unzip.h
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/zip.h
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/ioapi.c
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/mztools.c
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/unzip.c
+        ${MBGL_ROOT}/render-test/ios/ZipArchive/minizip/zip.c
+        ${MBGL_ROOT}/render-test/ios/main.m ${RESOURCES}
     )
-
     initialize_ios_target(RenderTestApp)
-    # Turn on ARC
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
 
     set_target_properties(
         RenderTestApp
@@ -165,6 +169,7 @@ if(MBGL_IOS_RENDER_TEST)
             "-framework OpenGLES"
             "-framework QuartzCore"
             "-framework UIKit"
+            z
             mbgl-render-test
     )
 

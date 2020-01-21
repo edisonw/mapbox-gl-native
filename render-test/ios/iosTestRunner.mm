@@ -2,6 +2,8 @@
 
 #include "ios_test_runner.hpp"
 
+#import "ZipArchive/ZipArchive.h"
+
 #include <string>
 
 @interface IosTestRunner ()
@@ -9,6 +11,8 @@
 @property (nullable) TestRunner* runner;
 
 @property (copy, nullable) NSString *resultPath;
+
+@property (copy, nullable) NSString *metricPath;
 
 @property BOOL testStatus;
 
@@ -69,15 +73,47 @@
             }
         }
         if (path) {
-            NSString *manifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.json"];
-            std::string manifest = std::string([manifestPath UTF8String]);
+// //            NSString *styleManifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.json"];
+// //            std::string styleManifest = std::string([styleManifestPath UTF8String]);
             
-            self.testStatus = self.runner->startTest(manifest);
+//             NSString *metricsManifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-metrics.json"];
+//             std::string metricsManifest = std::string([metricsManifestPath UTF8String]);
+            
+//            self.testStatus = self.runner->startTest(styleManifest);
+            std::string basePath = std::string([path UTF8String]);
+            self.testStatus = self.runner->startTest(basePath);
             self.resultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
-            
+
+            NSString *docDirectory = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner"];
+            BOOL isDir = NO;
+            NSArray *subpaths = [[NSArray alloc] init];;
+            NSString *exportPath = docDirectory;
+            if ([fileManager fileExistsAtPath:exportPath isDirectory:&isDir] && isDir){
+                subpaths = [fileManager subpathsAtPath:exportPath];
+            }
+            NSString *archivePath = [docDirectory stringByAppendingString:@"/metrics.zip"];
+            ZipArchive *archiver = [[ZipArchive alloc] init];
+            [archiver CreateZipFile2:archivePath];
+            for(NSString *path in subpaths)
+            {
+                NSString *longPath = [exportPath stringByAppendingPathComponent:path];
+                if([fileManager fileExistsAtPath:longPath isDirectory:&isDir] && !isDir)
+                {
+                    [archiver addFileToZip:longPath newname:path];
+                }
+            }
+
+            if([archiver CloseZipFile2]) {
+                NSLog(@"Successfully archive all of the metrics into metrics.zip");
+                self.metricPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner/metrics.zip"];
+            }
+            else {
+                NSLog(@"Failed to archive metrics into metrics.zip");
+            }
+   
             BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
             if (!fileFound) {
-                NSLog(@"File doese not exit %@", self.resultPath);
+                NSLog(@"Style test result file '%@' doese not exit ", self.resultPath);
             }
             self.testStatus &= fileFound;
         }
@@ -90,6 +126,10 @@
 
 - (NSString*) getResultPath {
    return self.resultPath;
+}
+
+- (NSString*) getMetricPath {
+   return self.metricPath;
 }
 
 - (BOOL) getTestStatus {

@@ -9,9 +9,10 @@
 #define EXPORT __attribute__((visibility("default")))
 
 EXPORT
-bool TestRunner::startTest(const std::string& manifest) {
+bool TestRunner::startTest(const std::string& manifestBasePath) {
+
     auto runTestWithManifest = [](const std::string& manifest) -> bool {
-        std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", manifest};
+        std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", manifest, "-u", "rebaseline"};
         std::vector<char*> argv;
         for (const auto& arg : arguments) {
             argv.push_back(const_cast<char*>(arg.data()));
@@ -31,9 +32,10 @@ bool TestRunner::startTest(const std::string& manifest) {
 
     auto ret = false;
     try {
-        ret = runTestWithManifest(manifest);
+        ret = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-style.json");
+        ret = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-metrics.json") && ret;
     } catch (...) {
-        mbgl::Log::Info(mbgl::Event::General, "testFailed");
+        mbgl::Log::Info(mbgl::Event::General, "iOS RenderTestRunner Failed to run all of the tests");
     }
     mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
     return ret;
