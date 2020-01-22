@@ -25,18 +25,21 @@ bool TestRunner::startTest(const std::string& manifestBasePath) {
         };
         mbgl::Log::Info(mbgl::Event::General, "Start running RenderTestRunner with manifest: '%s'", manifest.c_str());
 
-        auto result = mbgl::runRenderTests(static_cast<int>(argv.size() - 1), argv.data(), testStatus) == 0;
+        bool result = mbgl::runRenderTests(static_cast<int>(argv.size() - 1), argv.data(), testStatus) == 0;
         mbgl::Log::Info(mbgl::Event::General, "End running RenderTestRunner with manifest: '%s'", manifest.c_str());
         return result;
     };
 
-    auto ret = false;
+    bool status = false;
     try {
-        ret = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-style.json");
-        ret = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-metrics.json") && ret;
+        status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-style.json");
+        status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-metrics.json") && status;
     } catch (...) {
         mbgl::Log::Info(mbgl::Event::General, "iOS RenderTestRunner Failed to run all of the tests");
     }
     mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
-    return ret;
+    if (!status) {
+         mbgl::Log::Info(mbgl::Event::General, "There are failing test cases");
+    }
+    return status;
 }

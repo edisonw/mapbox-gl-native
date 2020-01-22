@@ -73,18 +73,21 @@
             }
         }
         if (path) {
-// //            NSString *styleManifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.json"];
-// //            std::string styleManifest = std::string([styleManifestPath UTF8String]);
-            
-//             NSString *metricsManifestPath = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-metrics.json"];
-//             std::string metricsManifest = std::string([metricsManifestPath UTF8String]);
-            
-//            self.testStatus = self.runner->startTest(styleManifest);
             std::string basePath = std::string([path UTF8String]);
             self.testStatus = self.runner->startTest(basePath);
             self.resultPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner-style.html"];
 
+            BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
+            if (!fileFound) {
+                NSLog(@"Style test result file '%@' doese not exit ", self.resultPath);
+            }
+            self.testStatus = self.testStatus && fileFound;
+            
             NSString *docDirectory = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner"];
+            fileFound = [fileManager fileExistsAtPath: docDirectory];
+            if (!fileFound) {
+                NSLog(@"Metric path '%@' doese not exit ", docDirectory);
+            }
             BOOL isDir = NO;
             NSArray *subpaths = [[NSArray alloc] init];;
             NSString *exportPath = docDirectory;
@@ -118,11 +121,7 @@
             } else {
                  NSLog(@"Failed to create archiver");
             }
-            BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
-            if (!fileFound) {
-                NSLog(@"Style test result file '%@' doese not exit ", self.resultPath);
-            }
-            self.testStatus &= fileFound;
+
         }
 
         delete self.runner;
