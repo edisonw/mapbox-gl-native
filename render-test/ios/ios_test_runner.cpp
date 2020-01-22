@@ -30,13 +30,9 @@ bool TestRunner::startTest(const std::string& manifestBasePath) {
         return result;
     };
 
-    bool status = false;
-    try {
-        status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-style.json");
-        status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-metrics.json") && status;
-    } catch (...) {
-        mbgl::Log::Info(mbgl::Event::General, "iOS RenderTestRunner Failed to run all of the tests");
-    }
+    bool status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-style.json");
+    status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-metrics.json") && status;
+
     mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
     if (!status) {
          mbgl::Log::Info(mbgl::Event::General, "There are failing test cases");
