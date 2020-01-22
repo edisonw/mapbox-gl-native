@@ -25,9 +25,10 @@ bool TestRunner::startTest(const std::string& manifestBasePath) {
         };
         mbgl::Log::Info(mbgl::Event::General, "Start running RenderTestRunner with manifest: '%s'", manifest.c_str());
 
-        bool result = mbgl::runRenderTests(static_cast<int>(argv.size() - 1), argv.data(), testStatus) == 0;
-        mbgl::Log::Info(mbgl::Event::General, "End running RenderTestRunner with manifest: '%s'", manifest.c_str());
-        return result;
+        auto result = mbgl::runRenderTests(static_cast<int>(argv.size() - 1), argv.data(), testStatus);
+        
+        mbgl::Log::Info(mbgl::Event::General, "End running RenderTestRunner with manifest: '%s' with result value %d", manifest.c_str(), result);
+        return result == 0;
     };
 
     bool status = runTestWithManifest(manifestBasePath + "/next-ios-render-test-runner-style.json");
