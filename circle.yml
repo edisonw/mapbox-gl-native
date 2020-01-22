@@ -19,7 +19,7 @@ workflows:
   #           - next-android-x86_64-release
   #           - next-linux-clang8-release
   #           - next-linux-gcc8-release
-  #           - next-macos-xcode11-release
+  #           - next-macos-xcode11-releasest
   #     - next-build-template:
   #         name: next-android-armeabi-v7a-release
   #         executor_name: ubuntu-disco
@@ -240,8 +240,21 @@ commands:
     parameters:
       build-ios-test-runner:
         type: boolean
-        default: true
+        default: false
     steps:
+      - restore_cache:
+          keys:
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
+      - run:
+          name: Prepare
+          command: |
+            git submodule sync
+            git submodule update --init --recursive
+            git gc
+            npm install --ignore-scripts
+            ulimit -c unlimited
       - run:
           name: Prepare macOS
           command: |
@@ -695,8 +708,9 @@ jobs:
     executor: macos-11_0_0
     steps:
       - checkout
-      - next-prepare
-      - next-prepare-macos
+      # - next-prepare
+      - next-prepare-macos:
+          build-ios-test-runner: true
       - run:
           name: Prepare codesign keychain 
           command: |
