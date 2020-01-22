@@ -2,6 +2,7 @@
 rm -rf ../../test-data
 mkdir ../../test-data
 mkdir ../../test-data/integration
+mkdir ../../test-data/baselines
 
 cp -r ../../mapbox-gl-js/test/integration/render-tests ../../test-data/integration/
 cp -r ../../mapbox-gl-js/test/integration/query-tests ../../test-data/integration/

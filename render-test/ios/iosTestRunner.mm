@@ -92,7 +92,7 @@
                 self.testStatus = NO;
             }
             
-            NSString *docDirectory = [path stringByAppendingPathComponent:@"/next-ios-render-test-runner"];
+            NSString *docDirectory = [path stringByAppendingPathComponent:@"/baselines"];
             fileFound = [fileManager fileExistsAtPath: docDirectory];
             if (!fileFound) {
                 NSLog(@"Metric path '%@' doese not exit ", docDirectory);
@@ -121,7 +121,7 @@
 
                 if([archiver CloseZipFile2]) {
                  NSLog(@"Successfully archive all of the metrics into metrics.zip");
-                 self.metricPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner/metrics.zip"];
+                 self.metricPath =  [path stringByAppendingPathComponent:@"/baselines/metrics.zip"];
                 }
                 else {
                  NSLog(@"Failed to archive rebaselined metrics into metrics.zip");
