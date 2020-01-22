@@ -761,20 +761,25 @@ jobs:
                 --verbosity=debug --no-record-video --results-dir ios-render-test-app-${CIRCLE_BUILD_NUM}
             fi
       - run:
-          name: Retrieve Test Result from gcloud
+          name: Retrieve Test Result and Rebaselined Metrics from gcloud
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
               testResult=$(gsutil ls -d gs://test-lab-hn7kwqcz3108z-hjm4qtbqqkymk/ios-render-test-app-${CIRCLE_BUILD_NUM}/iphonexs-12.0-en-portrait/TestLogs/)
               mkdir -p render-test-app
               gsutil -m cp -r $testResult render-test-app
-              cd render-test-app/TestLogs && ls
-              xcparse attachments *.xcresult
-              ls
+              cd render-test-app/TestLogs
+              xcparse attachments *.xcresult && ls
               cd ../.. && mkdir -p /tmp/tests/ios-render-test
               if ls render-test-app/TestLogs/*.html 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.html /tmp/tests/ios-render-test; fi
-              if ls render-test-app/TestLogs/*.zip 1> /dev/null 2>&1; then cp render-test-app/TestLogs/*.zip /tmp/tests/ios-render-test; fi
+              if ls render-test-app/TestLogs/*.zip 1> /dev/null 2>&1; then
+                cp render-test-app/TestLogs/*.zip metrics/next-ios-render-test-runner/
+                cd metrics/next-ios-render-test-runner/
+                unzip *.zip && rm *.zip
+              fi
             fi
+      - run:
+          name: 
       - next-save
   next-android-benchmark-runner:
     executor: ubuntu-disco

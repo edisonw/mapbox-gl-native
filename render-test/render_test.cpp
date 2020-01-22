@@ -140,7 +140,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     mbgl::util::RunLoop runLoop;
     TestRunner runner(std::move(*manifestData), updateResults);
     if (shuffle) {
-        mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
+        printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
         runner.doShuffle(seed);
     }
 
@@ -178,7 +178,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             metadata.ignoredTest = shouldIgnore = true;
             ignoreReason = it->second;
             if (ignoreReason.rfind("skip", 0) == 0) {
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_GRAY "* skipped %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
+                printf(ANSI_COLOR_GRAY "* skipped %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
                 continue;
             }
         }
@@ -198,12 +198,12 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
                 status = "ignored passed";
                 color = "#E8A408";
                 stats.ignorePassedTests++;
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_YELLOW "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
+                printf(ANSI_COLOR_YELLOW "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
             } else {
                 status = "ignored failed";
                 color = "#9E9E9E";
                 stats.ignoreFailedTests++;
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_LIGHT_GRAY "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
+                printf(ANSI_COLOR_LIGHT_GRAY "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
             }
         } else {
             // Only fail the bots on render errors, this is a CI limitation that we need
@@ -212,25 +212,24 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
             // report the error and block the patch from being merged.
             if (metadata.renderErrored || metadata.renderFailed) {
                 returnCode = 1;
-                 mbgl::Log::Info(mbgl::Event::General, "There is render error or failure");
             }
 
             if (passed) {
                 status = "passed";
                 color = "green";
                 stats.passedTests++;
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_GREEN "* passed %s" ANSI_COLOR_RESET "\n", id.c_str());
+                printf(ANSI_COLOR_GREEN "* passed %s" ANSI_COLOR_RESET "\n", id.c_str());
             } else if (errored) {
                 status = "errored";
                 color = "red";
                 stats.erroredTests++;
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_RED "* errored %s" ANSI_COLOR_RESET "\n", id.c_str());
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_RED "* error: %s" ANSI_COLOR_RESET "\n", metadata.errorMessage.c_str());
+                printf(ANSI_COLOR_RED "* errored %s" ANSI_COLOR_RESET "\n", id.c_str());
+                printf(ANSI_COLOR_RED "* error: %s" ANSI_COLOR_RESET "\n", metadata.errorMessage.c_str());
             } else {
                 status = "failed";
                 color = "red";
                 stats.failedTests++;
-                mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_RED "* failed %s" ANSI_COLOR_RESET "\n", id.c_str());
+                printf(ANSI_COLOR_RED "* failed %s" ANSI_COLOR_RESET "\n", id.c_str());
             }
         }
 
@@ -249,22 +248,22 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
         stats.erroredTests + stats.failedTests + stats.ignoreFailedTests + stats.ignorePassedTests + stats.passedTests;
 
     if (stats.passedTests) {
-        mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_GREEN "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.passedTests, 100.0 * stats.passedTests / count);
+        printf(ANSI_COLOR_GREEN "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.passedTests, 100.0 * stats.passedTests / count);
     }
     if (stats.ignorePassedTests) {
-        mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_YELLOW "%u passed but were ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignorePassedTests, 100.0 * stats.ignorePassedTests / count);
+        printf(ANSI_COLOR_YELLOW "%u passed but were ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignorePassedTests, 100.0 * stats.ignorePassedTests / count);
     }
     if (stats.ignoreFailedTests) {
-        mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_LIGHT_GRAY "%u ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignoreFailedTests, 100.0 * stats.ignoreFailedTests / count);
+        printf(ANSI_COLOR_LIGHT_GRAY "%u ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignoreFailedTests, 100.0 * stats.ignoreFailedTests / count);
     }
     if (stats.failedTests) {
-        mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_RED "%u failed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.failedTests, 100.0 * stats.failedTests / count);
+        printf(ANSI_COLOR_RED "%u failed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.failedTests, 100.0 * stats.failedTests / count);
     }
     if (stats.erroredTests) {
-        mbgl::Log::Info(mbgl::Event::General, ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
+        printf(ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
     }
 
-    mbgl::Log::Info(mbgl::Event::General, "Results at: %s\n", mbgl::filesystem::canonical(resultPath).c_str());
+    printf("Results at: %s\n", mbgl::filesystem::canonical(resultPath).c_str());
 
     return returnCode;
 }
