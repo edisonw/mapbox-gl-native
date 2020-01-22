@@ -91,26 +91,33 @@
             if ([fileManager fileExistsAtPath:exportPath isDirectory:&isDir] && isDir){
                 subpaths = [fileManager subpathsAtPath:exportPath];
             }
+            else {
+                 NSLog(@"Failed to find the archive sub directory");
+            }
             NSString *archivePath = [docDirectory stringByAppendingString:@"/metrics.zip"];
             ZipArchive *archiver = [[ZipArchive alloc] init];
-            [archiver CreateZipFile2:archivePath];
-            for(NSString *path in subpaths)
-            {
-                NSString *longPath = [exportPath stringByAppendingPathComponent:path];
-                if([fileManager fileExistsAtPath:longPath isDirectory:&isDir] && !isDir)
+            if (archiver) {
+                [archiver CreateZipFile2:archivePath];
+                for(NSString *path in subpaths)
                 {
-                    [archiver addFileToZip:longPath newname:path];
+                 NSString *longPath = [exportPath stringByAppendingPathComponent:path];
+                 if([fileManager fileExistsAtPath:longPath isDirectory:&isDir] && !isDir)
+                 {
+                     [archiver addFileToZip:longPath newname:path];
+                 }
                 }
-            }
 
-            if([archiver CloseZipFile2]) {
-                NSLog(@"Successfully archive all of the metrics into metrics.zip");
-                self.metricPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner/metrics.zip"];
+                if([archiver CloseZipFile2]) {
+                 NSLog(@"Successfully archive all of the metrics into metrics.zip");
+                 self.metricPath =  [path stringByAppendingPathComponent:@"/next-ios-render-test-runner/metrics.zip"];
+                }
+                else {
+                 NSLog(@"Failed to archive metrics into metrics.zip");
+                }
+                
+            } else {
+                 NSLog(@"Failed to create archiver");
             }
-            else {
-                NSLog(@"Failed to archive metrics into metrics.zip");
-            }
-   
             BOOL fileFound = [fileManager fileExistsAtPath: self.resultPath];
             if (!fileFound) {
                 NSLog(@"Style test result file '%@' doese not exit ", self.resultPath);
